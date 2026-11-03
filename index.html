@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DiscountBundle adds discounts to individual Kimai invoices: fixed amounts or percentages, applied before tax, with correct totals on the invoice, in the PDF, the payment QR code and the invoice history.">
+    <title>Kimai DiscountBundle — Discounts on individual Kimai invoices</title>
+    <link rel="canonical" href="https://kimai-discountbundle.jancejka.cz/">
+    <link rel="alternate" hreflang="en" href="https://kimai-discountbundle.jancejka.cz/">
+    <link rel="alternate" hreflang="cs" href="https://kimai-discountbundle.jancejka.cz/cs/">
+    <link rel="alternate" hreflang="x-default" href="https://kimai-discountbundle.jancejka.cz/">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23c0622a'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='30' font-weight='700' fill='white' text-anchor='middle'%3E%E2%88%92%25%3C/text%3E%3C/svg%3E">
+
+    <link rel="stylesheet" href="styles/tailwind.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(232, 196, 166, 0.55), transparent 0 32%),
+                radial-gradient(circle at 0% 30%, rgba(246, 220, 200, 0.45), transparent 0 28%),
+                #f8f1e9;
+            color: #2f1d12;
+        }
+
+        .section-card {
+            background: rgba(255, 253, 250, 0.82);
+            border: 1px solid #eadccd;
+            backdrop-filter: blur(6px);
+        }
+
+        .eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 1.1rem;
+            height: 2px;
+            margin-right: 0.55rem;
+            vertical-align: middle;
+            background: currentColor;
+        }
+
+        .strike {
+            text-decoration: line-through;
+            text-decoration-thickness: 1.5px;
+        }
+
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] .faq-icon { transform: rotate(45deg); }
+    </style>
+</head>
+<body class="min-h-full antialiased">
+<div class="relative isolate overflow-hidden">
+
+    <header class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-3">
+            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-copper-500 text-base font-extrabold text-white shadow-soft">−%</div>
+            <div>
+                <div class="font-display text-lg font-extrabold tracking-tight text-ink">Discount<span class="text-copper-500">Bundle</span></div>
+                <div class="text-sm text-muted">Plugin for Kimai</div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <nav aria-label="Language" class="flex items-center rounded-full border border-line bg-paper/70 p-1 text-xs font-bold">
+                <span aria-current="page" class="rounded-full bg-ink px-2.5 py-1 text-white">EN</span>
+                <a href="cs/" hreflang="cs" lang="cs" data-umami-event="language-switch" data-umami-event-lang="cs" class="rounded-full px-2.5 py-1 text-muted transition hover:text-ink">CZ</a>
+            </nav>
+            <a href="https://github.com/Cuchulain/kimai-discount-bundle-dist/releases/latest/download/DiscountBundle.zip" data-umami-event="download-release" data-umami-event-placement="header" class="hidden rounded-full border border-line bg-paper/70 px-4 py-2 text-sm font-semibold text-ink transition hover:border-copper-500/50 md:inline-flex">Download free</a>
+            <a href="https://witcher.lemonsqueezy.com/checkout/buy/a7fea23c-0c89-49e4-8d8a-71d21d94d8ed" data-umami-event="buy-click" data-umami-event-placement="header" target="_blank" rel="noopener noreferrer" class="hidden rounded-full bg-copper-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-copper-600 md:inline-flex">Buy license</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:pb-20 lg:pt-10">
+            <div class="flex flex-col justify-center">
+                <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-500">Per-invoice discounts for Kimai</p>
+
+                <h1 class="mt-4 font-display text-4xl font-black leading-[1.02] tracking-tight text-ink sm:text-5xl lg:text-6xl">
+                    Decide the discount when you invoice.
+                </h1>
+
+                <p class="mt-5 max-w-2xl text-lg text-muted sm:text-xl">
+                    Add fixed or percentage discounts to a single Kimai invoice, right on the “Create invoice” page.
+                    Subtotal, tax and total are calculated from the discounted amount — on the invoice, in the PDF,
+                    in the payment QR code and in the invoice history.
+                </p>
+
+                <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                    <a href="https://github.com/Cuchulain/kimai-discount-bundle-dist/releases/latest/download/DiscountBundle.zip"
+                       data-umami-event="download-release"
+                       data-umami-event-placement="hero"
+                       class="inline-flex items-center justify-center rounded-full bg-copper-500 px-6 py-3 text-base font-bold text-white shadow-soft transition hover:bg-copper-600">
+                        Download latest ZIP
+                    </a>
+                    <a href="https://witcher.lemonsqueezy.com/checkout/buy/a7fea23c-0c89-49e4-8d8a-71d21d94d8ed"
+                       data-umami-event="buy-click"
+                       data-umami-event-placement="hero"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="inline-flex items-center justify-center rounded-full border border-ink/20 bg-paper/70 px-6 py-3 text-base font-semibold text-ink transition hover:border-copper-500/60">
+                        Buy license · 49 € / year
+                    </a>
+                </div>
+
+                <p class="mt-3 text-sm text-muted">
+                    Free to use for 3 discounts per month. Requires Kimai 2.71 or newer.
+                </p>
+
+                <dl class="mt-8 grid gap-3 sm:grid-cols-3">
+                    <div class="section-card rounded-2xl p-4 shadow-card">
+                        <dt class="text-sm text-muted">Discount lines</dt>
+                        <dd class="mt-1 text-lg font-bold text-ink">Fixed amount · Percent</dd>
+                    </div>
+                    <div class="section-card rounded-2xl p-4 shadow-card">
+                        <dt class="text-sm text-muted">Calculation</dt>
+                        <dd class="mt-1 text-lg font-bold text-ink">Net amount, before tax</dd>
+                    </div>
+                    <div class="section-card rounded-2xl p-4 shadow-card">
+                        <dt class="text-sm text-muted">One-time use</dt>
+                        <dd class="mt-1 text-lg font-bold text-ink">Preview is free, saving uses it</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div class="relative flex items-center">
+                <div class="section-card w-full rounded-[28px] bg-paper p-6 shadow-soft sm:p-8 lg:rotate-[1.5deg]">
+                    <div class="flex items-baseline justify-between gap-4 border-b-2 border-ink pb-3">
+                        <div class="font-display text-2xl font-extrabold text-ink">Invoice</div>
+                        <div class="text-sm text-muted">Northwind Studio GmbH</div>
+                    </div>
+
+                    <div class="divide-y divide-line">
+                        <div class="flex items-center justify-between gap-4 py-3">
+                            <div>
+                                <div class="font-medium text-ink">Implementation of the new website</div>
+                                <div class="text-xs text-muted">Fixed price</div>
+                            </div>
+                            <div class="tabular-nums text-ink">€600.00</div>
+                        </div>
+                        <div class="flex items-center justify-between gap-4 py-3">
+                            <div>
+                                <div class="font-medium text-ink">Workshop and content consulting</div>
+                                <div class="text-xs text-muted">4 h × €100.00</div>
+                            </div>
+                            <div class="tabular-nums text-ink">€400.00</div>
+                        </div>
+                    </div>
+
+                    <div class="my-1 rounded-r-xl border-l-4 border-copper-500 bg-copper-50">
+                        <div class="flex items-center justify-between gap-4 px-4 py-3">
+                            <div>
+                                <div class="font-semibold text-copper-600">Loyalty discount</div>
+                                <div class="text-xs text-copper-700/80">10 % of €1,000.00</div>
+                            </div>
+                            <div class="tabular-nums font-semibold text-copper-600">−€100.00</div>
+                        </div>
+                        <div class="flex items-center justify-between gap-4 border-t border-copper-100 px-4 py-3">
+                            <div>
+                                <div class="font-semibold text-copper-600">Credit for delayed delivery</div>
+                                <div class="text-xs text-copper-700/80">Fixed amount</div>
+                            </div>
+                            <div class="tabular-nums font-semibold text-copper-600">−€100.00</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 space-y-1 text-sm text-muted">
+                        <div class="flex justify-between"><span>Net amount</span><span class="tabular-nums text-ink">€800.00</span></div>
+                        <div class="flex justify-between"><span>VAT 21 %</span><span class="tabular-nums text-ink">€168.00</span></div>
+                    </div>
+
+                    <div class="mt-3 flex items-baseline justify-between border-t-2 border-ink pt-3">
+                        <div class="font-display text-xl font-extrabold text-ink">Total</div>
+                        <div class="flex items-baseline gap-3">
+                            <span class="strike tabular-nums text-sm text-muted">€1,210.00</span>
+                            <span class="tabular-nums font-display text-2xl font-extrabold text-ink">€968.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div class="section-card rounded-[28px] p-6 shadow-card sm:p-8">
+                <div class="max-w-3xl">
+                    <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-500">What it does</p>
+                    <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">A discount that belongs to one invoice — not to a customer or a template.</h2>
+                    <p class="mt-3 text-lg text-muted">You see the invoice amount first, then decide. Time entries, rates and budgets stay untouched.</p>
+                </div>
+
+                <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    <article class="rounded-2xl border border-line bg-paper p-5">
+                        <div class="text-2xl">🧾</div>
+                        <h3 class="mt-3 text-xl font-bold text-ink">Multiple discount lines</h3>
+                        <p class="mt-2 text-muted">Up to 10 lines per invoice, each with its own description and either a fixed net amount or a percentage.</p>
+                    </article>
+                    <article class="rounded-2xl border border-line bg-paper p-5">
+                        <div class="text-2xl">⚡</div>
+                        <h3 class="mt-3 text-xl font-bold text-ink">Entered where you invoice</h3>
+                        <p class="mt-2 text-muted">Click “+ Discount” next to the customer on the “Create invoice” page. The total price column updates immediately.</p>
+                    </article>
+                    <article class="rounded-2xl border border-line bg-paper p-5">
+                        <div class="text-2xl">✅</div>
+                        <h3 class="mt-3 text-xl font-bold text-ink">Correct totals everywhere</h3>
+                        <p class="mt-2 text-muted">The discount is part of the invoice lines, subtotal, taxes and total stored in Kimai — and of the PDF, the payment QR code and the XLSX export.</p>
+                    </article>
+                    <article class="rounded-2xl border border-line bg-paper p-5">
+                        <div class="text-2xl">🔒</div>
+                        <h3 class="mt-3 text-xl font-bold text-ink">Used exactly once</h3>
+                        <p class="mt-2 text-muted">Preview as often as you like. Saving the invoice uses the discount — also with two open tabs, a double click or a resubmitted form.</p>
+                    </article>
+                    <article class="rounded-2xl border border-line bg-paper p-5">
+                        <div class="text-2xl">📌</div>
+                        <h3 class="mt-3 text-xl font-bold text-ink">Immutable snapshot</h3>
+                        <p class="mt-2 text-muted">Every saved invoice keeps a snapshot of its discounts and calculation, so historical invoices never change.</p>
+                    </article>
+                    <article class="rounded-2xl border border-line bg-paper p-5">
+                        <div class="text-2xl">📊</div>
+                        <h3 class="mt-3 text-xl font-bold text-ink">Report with discounts</h3>
+                        <p class="mt-2 text-muted">“Invoiced (with discounts)” sums saved invoices by customer and month: net before discount, discount, tax and total. <span class="font-semibold text-copper-600">License</span></p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div class="section-card rounded-[28px] p-6 shadow-card sm:p-8">
+                <div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+                    <div>
+                        <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-500">Calculation</p>
+                        <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">One clear rule: one after another, on the remaining net amount.</h2>
+                        <ul class="mt-5 space-y-3 text-base text-muted">
+                            <li class="flex gap-3"><span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-copper-500"></span><span>Each line is applied in order to what is left after the previous one; taxes are calculated afterwards.</span></li>
+                            <li class="flex gap-3"><span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-copper-500"></span><span>Calculated in whole cents, percentages rounded half-up. The discount lines always add up exactly.</span></li>
+                            <li class="flex gap-3"><span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-copper-500"></span><span>Without a discount, the plugin calculates exactly like Kimai’s own calculator.</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-2xl border border-line bg-paper">
+                        <table class="w-full min-w-[30rem] text-left text-sm">
+                            <thead class="bg-cream text-xs uppercase tracking-wider text-muted">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 font-semibold">Net amount</th>
+                                    <th scope="col" class="px-4 py-3 font-semibold">Discount lines</th>
+                                    <th scope="col" class="px-4 py-3 text-right font-semibold">Result (net)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-line tabular-nums text-ink">
+                                <tr>
+                                    <td class="px-4 py-3">€1,000.00</td>
+                                    <td class="px-4 py-3 text-copper-600">−10 %, then −€100.00</td>
+                                    <td class="px-4 py-3 text-right font-bold">€800.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3">€1,000.00</td>
+                                    <td class="px-4 py-3 text-copper-600">−€100.00, then −10 %</td>
+                                    <td class="px-4 py-3 text-right font-bold">€810.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3">€1,000.00</td>
+                                    <td class="px-4 py-3 text-copper-600">−10 %, then −10 %</td>
+                                    <td class="px-4 py-3 text-right font-bold">€810.00</td>
+                                </tr>
+                                <tr class="bg-copper-50/60">
+                                    <td class="px-4 py-3" colspan="2">€800.00 net + VAT 21 % (€168.00)</td>
+                                    <td class="px-4 py-3 text-right font-extrabold">€968.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div class="grid gap-6 lg:grid-cols-2">
+                <article class="section-card overflow-hidden rounded-[28px] p-4 shadow-card sm:p-5">
+                    <div class="mb-4">
+                        <p class="text-sm font-bold uppercase tracking-[0.16em] text-copper-500">Create invoice</p>
+                        <h3 class="font-display text-2xl font-extrabold text-ink">Discount editor next to the customer</h3>
+                    </div>
+                    <img src="images/editor.png" alt="Kimai Create invoice page with the discount editor open for one customer" width="1600" height="815" class="w-full rounded-2xl border border-line" loading="lazy">
+                    <p class="mt-4 text-muted">Add lines, choose percent or fixed amount and click “Use”. Invalid input is shown in the editor and nothing is saved.</p>
+                </article>
+
+                <article class="section-card overflow-hidden rounded-[28px] p-4 shadow-card sm:p-5">
+                    <div class="mb-4">
+                        <p class="text-sm font-bold uppercase tracking-[0.16em] text-copper-500">Total price</p>
+                        <h3 class="font-display text-2xl font-extrabold text-ink">See the discounted total before saving</h3>
+                    </div>
+                    <img src="images/row-total.png" alt="Customer row showing the discounted total and the original amount" width="1600" height="570" class="w-full rounded-2xl border border-line" loading="lazy">
+                    <p class="mt-4 text-muted">The server calculates the total exactly like the preview: discounted amount with tax in bold, the original amount below.</p>
+                </article>
+
+                <article class="section-card overflow-hidden rounded-[28px] p-4 shadow-card sm:p-5">
+                    <div class="mb-4">
+                        <p class="text-sm font-bold uppercase tracking-[0.16em] text-copper-500">Invoice document</p>
+                        <h3 class="font-display text-2xl font-extrabold text-ink">Your templates just work</h3>
+                    </div>
+                    <div class="max-h-[30rem] overflow-hidden rounded-2xl border border-line">
+                        <img src="images/invoice.png" alt="Invoice PDF with two discount lines and recalculated subtotal, tax and total" width="1230" height="1600" class="w-full" loading="lazy">
+                    </div>
+                    <p class="mt-4 text-muted">Discounts are regular invoice lines with a negative amount. Kimai’s built-in documents need no changes; custom templates get extra variables such as <code class="rounded bg-copper-50 px-1.5 py-0.5 text-sm text-copper-700">invoice.discount_total</code>.</p>
+                </article>
+
+                <article class="section-card overflow-hidden rounded-[28px] p-4 shadow-card sm:p-5">
+                    <div class="mb-4">
+                        <p class="text-sm font-bold uppercase tracking-[0.16em] text-copper-500">Reporting</p>
+                        <h3 class="font-display text-2xl font-extrabold text-ink">Invoiced amounts with discounts</h3>
+                    </div>
+                    <img src="images/report.png" alt="Report Invoiced (with discounts) grouped by customer with totals per currency" width="1600" height="1061" class="w-full rounded-2xl border border-line" loading="lazy">
+                    <p class="mt-4 text-muted">Filter by period, customer and status, group by customer and/or month, totals per currency and XLSX export.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="pricing" class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div class="section-card rounded-[28px] p-6 shadow-card sm:p-8">
+                <div class="max-w-3xl">
+                    <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-500">Pricing</p>
+                    <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">Start free. License when you need more.</h2>
+                </div>
+
+                <div class="mt-8 grid gap-4 md:grid-cols-2">
+                    <div class="rounded-2xl border border-line bg-paper p-6">
+                        <div class="text-sm font-bold uppercase tracking-[0.14em] text-muted">Free</div>
+                        <div class="mt-2 font-display text-4xl font-black text-ink">0 €</div>
+                        <ul class="mt-5 space-y-3 text-muted">
+                            <li class="flex gap-3"><span class="text-copper-500">✓</span><span><strong class="text-ink">3 discounts per month</strong> per Kimai installation</span></li>
+                            <li class="flex gap-3"><span class="text-copper-500">✓</span><span>All invoice features: editor, PDF, QR code, snapshots, history</span></li>
+                            <li class="flex gap-3"><span class="text-muted/50">–</span><span>Report “Invoiced (with discounts)”</span></li>
+                        </ul>
+                        <a href="https://github.com/Cuchulain/kimai-discount-bundle-dist/releases/latest/download/DiscountBundle.zip"
+                           data-umami-event="download-release"
+                           data-umami-event-placement="pricing"
+                           class="mt-6 inline-flex w-full items-center justify-center rounded-full border border-ink/20 px-6 py-3 font-semibold text-ink transition hover:border-copper-500/60">
+                            Download free
+                        </a>
+                    </div>
+
+                    <div class="rounded-2xl border-2 border-copper-500 bg-paper p-6 shadow-soft">
+                        <div class="text-sm font-bold uppercase tracking-[0.14em] text-copper-500">License</div>
+                        <div class="mt-2 font-display text-4xl font-black text-ink">49 € <span class="text-lg font-semibold text-muted">/ year</span></div>
+                        <ul class="mt-5 space-y-3 text-muted">
+                            <li class="flex gap-3"><span class="text-copper-500">✓</span><span><strong class="text-ink">Unlimited discounts</strong></span></li>
+                            <li class="flex gap-3"><span class="text-copper-500">✓</span><span>Report “Invoiced (with discounts)” and its XLSX export</span></li>
+                            <li class="flex gap-3"><span class="text-copper-500">✓</span><span>One production and one test installation</span></li>
+                        </ul>
+                        <a href="https://witcher.lemonsqueezy.com/checkout/buy/a7fea23c-0c89-49e4-8d8a-71d21d94d8ed"
+                           data-umami-event="buy-click"
+                           data-umami-event-placement="pricing"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="mt-6 inline-flex w-full items-center justify-center rounded-full bg-copper-500 px-6 py-3 font-bold text-white transition hover:bg-copper-600">
+                            Buy on Lemon Squeezy
+                        </a>
+                    </div>
+                </div>
+
+                <p class="mt-5 text-sm text-muted">
+                    Activate the key in Kimai under <strong class="text-ink">System → DiscountBundle license</strong>. The license is verified at most once every 7 days
+                    (only the key, the activation ID and the Kimai domain are sent) and stays valid for 30 days if the server is unreachable.
+                    When it ends, the plugin falls back to the free version — existing invoices and their discounts stay unchanged.
+                </p>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div class="section-card rounded-[28px] p-6 shadow-card sm:p-8">
+                <div class="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+                    <div>
+                        <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-500">Quick start</p>
+                        <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">Install, pick a calculator, discount your next invoice.</h2>
+                        <ol class="mt-5 space-y-3 text-base text-muted">
+                            <li class="flex gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-copper-500 text-xs font-bold text-white">1</span><span>Unzip the plugin into <code class="text-ink">var/plugins/</code> so that <code class="text-ink">var/plugins/DiscountBundle/</code> exists, then run the commands on the right.</span></li>
+                            <li class="flex gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-copper-500 text-xs font-bold text-white">2</span><span>In <strong class="text-ink">Invoices → Invoice template</strong>, set the grouping of invoice lines to “Default + discount” or “Project + discount”.</span></li>
+                            <li class="flex gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-copper-500 text-xs font-bold text-white">3</span><span>On <strong class="text-ink">Invoices → Create invoice</strong>, click “+ Discount”, add your lines and save the invoice.</span></li>
+                        </ol>
+                    </div>
+
+                    <div class="rounded-[24px] border border-line bg-paper p-5 shadow-card">
+                        <div class="mb-3 text-sm font-semibold uppercase tracking-[0.14em] text-muted">Install commands</div>
+                        <pre class="overflow-x-auto rounded-2xl bg-ink p-4 text-sm leading-6 text-cream">unzip DiscountBundle.zip -d var/plugins/
+bin/console kimai:reload
+bin/console kimai:bundle:discount:install</pre>
+                        <p class="mt-3 text-sm text-muted">Run as the web server user (e.g. <code class="text-ink">www-data</code>). Works in Docker with <code class="text-ink">kimai/kimai2</code>.</p>
+                        <div class="mt-4 grid gap-3 text-sm text-ink">
+                            <div class="rounded-2xl border border-line px-4 py-3">Kimai 2.71 or newer (tested with 2.71.0)</div>
+                            <div class="rounded-2xl border border-line px-4 py-3">MySQL / MariaDB, like Kimai itself</div>
+                            <div class="rounded-2xl border border-line px-4 py-3">Currencies with two decimal places (EUR, CZK, USD …)</div>
+                            <div class="rounded-2xl border border-line px-4 py-3">Interface in English and Czech</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div class="section-card rounded-[28px] p-6 shadow-card sm:p-8">
+                <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-500">FAQ</p>
+                <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">Good to know</h2>
+
+                <div class="mt-6 divide-y divide-line border-y border-line">
+                    <details class="group py-4">
+                        <summary class="flex cursor-pointer items-center justify-between gap-4 text-lg font-semibold text-ink">Do I have to change my invoice template?<span class="faq-icon text-2xl font-light text-copper-500 transition">+</span></summary>
+                        <p class="mt-3 text-muted">No. Discount lines are part of <code>entries</code>, and <code>invoice.subtotal</code>, <code>invoice.tax_rows</code>, <code>invoice.total</code> and <code>invoice.total_plain</code> already include them. Only custom documents that add up totals on their own need an update — and the discount must never be subtracted again in Twig.</p>
+                    </details>
+                    <details class="group py-4">
+                        <summary class="flex cursor-pointer items-center justify-between gap-4 text-lg font-semibold text-ink">Does it change time entries, rates or budgets?<span class="faq-icon text-2xl font-light text-copper-500 transition">+</span></summary>
+                        <p class="mt-3 text-muted">No. Worked time, rates, internal rates and budgets stay as they are. That is also why Kimai’s time-entry based reports don’t include the discount — the invoice history, its export and the plugin’s own report do.</p>
+                    </details>
+                    <details class="group py-4">
+                        <summary class="flex cursor-pointer items-center justify-between gap-4 text-lg font-semibold text-ink">What happens when I select a discount with another calculator?<span class="faq-icon text-2xl font-light text-copper-500 transition">+</span></summary>
+                        <p class="mt-3 text-muted">Kimai rejects the preview and saving with a clear message. A discount is never ignored silently.</p>
+                    </details>
+                    <details class="group py-4">
+                        <summary class="flex cursor-pointer items-center justify-between gap-4 text-lg font-semibold text-ink">Can I uninstall it later?<span class="faq-icon text-2xl font-light text-copper-500 transition">+</span></summary>
+                        <p class="mt-3 text-muted">Yes. Switch your invoice templates back to Kimai’s calculators and disable the plugin. Saved invoices, their amounts, PDFs and snapshots stay unchanged; the plugin never deletes data automatically.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8 lg:pb-24">
+            <div class="rounded-[32px] bg-ink p-6 text-cream shadow-soft sm:p-8 lg:p-10">
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                    <div class="max-w-2xl">
+                        <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-100">Ready to use</p>
+                        <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Give the discount on the invoice, not around it.</h2>
+                        <p class="mt-3 text-lg text-cream/75">Download the free version and try it on your next invoice. Upgrade any time for unlimited discounts and the report.</p>
+                    </div>
+                    <div class="flex flex-col gap-3 sm:flex-row">
+                        <a href="https://github.com/Cuchulain/kimai-discount-bundle-dist/releases"
+                           data-umami-event="public-release"
+                           data-umami-event-placement="bottom"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-flex items-center justify-center rounded-full border border-cream/30 px-6 py-3 text-base font-semibold text-white transition hover:border-cream/60">
+                            All releases
+                        </a>
+                        <a href="https://witcher.lemonsqueezy.com/checkout/buy/a7fea23c-0c89-49e4-8d8a-71d21d94d8ed"
+                           data-umami-event="buy-click"
+                           data-umami-event-placement="bottom"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-flex items-center justify-center rounded-full bg-copper-500 px-6 py-3 text-base font-bold text-white transition hover:bg-copper-600">
+                            Buy on Lemon Squeezy
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="mx-auto max-w-7xl px-4 pb-8 text-center sm:px-6 lg:px-8">
+        <div class="border-t border-line pt-5 text-sm text-muted">
+            Created by <a href="https://github.com/Cuchulain" target="_blank" rel="noopener noreferrer" class="font-semibold text-ink transition hover:text-copper-600">Jan Čejka</a> · © 2026
+            · Also by the author: <a href="https://kimai-jira-sync.jancejka.cz/" target="_blank" rel="noopener" class="font-semibold text-ink transition hover:text-copper-600">Kimai Jira Sync</a>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

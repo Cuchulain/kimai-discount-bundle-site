@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="cs" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DiscountBundle přidává slevy ke konkrétním fakturám v Kimai: pevnou částkou nebo procentem, před zdaněním, se správnými součty na faktuře, v PDF, v platebním QR kódu i v historii faktur.">
+    <title>Kimai DiscountBundle — Slevy na konkrétních fakturách v Kimai</title>
+    <link rel="canonical" href="https://kimai-discountbundle.jancejka.cz/cs/">
+    <link rel="alternate" hreflang="en" href="https://kimai-discountbundle.jancejka.cz/">
+    <link rel="alternate" hreflang="cs" href="https://kimai-discountbundle.jancejka.cz/cs/">
+    <link rel="alternate" hreflang="x-default" href="https://kimai-discountbundle.jancejka.cz/">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23c0622a'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='30' font-weight='700' fill='white' text-anchor='middle'%3E%E2%88%92%25%3C/text%3E%3C/svg%3E">
+
+    <link rel="stylesheet" href="../styles/tailwind.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(232, 196, 166, 0.55), transparent 0 32%),
+                radial-gradient(circle at 0% 30%, rgba(246, 220, 200, 0.45), transparent 0 28%),
+                #f8f1e9;
+            color: #2f1d12;
+        }
+
+        .section-card {
+            background: rgba(255, 253, 250, 0.82);
+            border: 1px solid #eadccd;
+            backdrop-filter: blur(6px);
+        }
+
+        .eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 1.1rem;
+            height: 2px;
+            margin-right: 0.55rem;
+            vertical-align: middle;
+            background: currentColor;
+        }
+
+        .strike {
+            text-decoration: line-through;
+            text-decoration-thickness: 1.5px;
+        }
+
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] .faq-icon { transform: rotate(45deg); }
+    </style>
+</head>
+<body class="min-h-full antialiased">
+<div class="relative isolate overflow-hidden">
+
+    <header class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-3">
+            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-copper-500 text-base font-extrabold text-white shadow-soft">−%</div>
+            <div>
+                <div class="font-display text-lg font-extrabold tracking-tight text-ink">Discount<span class="text-copper-500">Bundle</span></div>
+                <div class="text-sm text-muted">Plugin pro Kimai</div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <nav aria-label="Jazyk" class="flex items-center rounded-full border border-line bg-paper/70 p-1 text-xs font-bold">
+                <a href="../" hreflang="en" lang="en" data-umami-event="language-switch" data-umami-event-lang="en" class="rounded-full px-2.5 py-1 text-muted transition hover:text-ink">EN</a>
+                <span aria-current="page" class="rounded-full bg-ink px-2.5 py-1 text-white">CZ</span>
+            </nav>
+            <a href="https://github.com/Cuchulain/kimai-discount-bundle-dist/releases/latest/download/DiscountBundle.zip" data-umami-event="download-release" data-umami-event-placement="header" class="hidden rounded-full border border-line bg-paper/70 px-4 py-2 text-sm font-semibold text-ink transition hover:border-copper-500/50 md:inline-flex">Stáhnout zdarma</a>
+            <a href="https://witcher.lemonsqueezy.com/checkout/buy/a7fea23c-0c89-49e4-8d8a-71d21d94d8ed" data-umami-event="buy-click" data-umami-event-placement="header" target="_blank" rel="noopener noreferrer" class="hidden rounded-full bg-copper-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-copper-600 md:inline-flex">Koupit licenci</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:pb-20 lg:pt-10">
+            <div class="flex flex-col justify-center">
+                <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-500">Slevy na fakturách v Kimai</p>
+
+                <h1 class="mt-4 font-display text-4xl font-black leading-[1.02] tracking-tight text-ink sm:text-5xl lg:text-6xl">
+                    O slevě rozhodnete, až fakturujete.
+                </h1>
+
+                <p class="mt-5 max-w-2xl text-lg text-muted sm:text-xl">
+                    Přidejte ke konkrétní faktuře v Kimai slevu pevnou částkou nebo procentem – přímo na stránce „Vytvořit fakturu“.
+                    Mezisoučet, daň i celková částka se počítají ze zlevněného základu – na faktuře, v PDF,
+                    v platebním QR kódu i v historii faktur.
+                </p>
+
+                <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                    <a href="https://github.com/Cuchulain/kimai-discount-bundle-dist/releases/latest/download/DiscountBundle.zip"
+                       data-umami-event="download-release"
+                       data-umami-event-placement="hero"
+                       class="inline-flex items-center justify-center rounded-full bg-copper-500 px-6 py-3 text-base font-bold text-white shadow-soft transition hover:bg-copper-600">
+                        Stáhnout nejnovější ZIP
+                    </a>
+                    <a href="https://witcher.lemonsqueezy.com/checkout/buy/a7fea23c-0c89-49e4-8d8a-71d21d94d8ed"
+                       data-umami-event="buy-click"
+                       data-umami-event-placement="hero"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="inline-flex items-center justify-center rounded-full border border-ink/20 bg-paper/70 px-6 py-3 text-base font-semibold text-ink transition hover:border-copper-500/60">
+                        Koupit licenci · 49 € / rok
+                    </a>
+                </div>
+
+                <p class="mt-3 text-sm text-muted">
+                    Zdarma na 3 slevy měsíčně. Vyžaduje Kimai 2.71 nebo novější.
+                </p>
+
+                <dl class="mt-8 grid gap-3 sm:grid-cols-3">
+                    <div class="section-card rounded-2xl p-4 shadow-card">
+                        <dt class="text-sm text-muted">Slevové řádky</dt>
+                        <dd class="mt-1 text-lg font-bold text-ink">Pevná částka · Procento</dd>
+                    </div>
+                    <div class="section-card rounded-2xl p-4 shadow-card">
+                        <dt class="text-sm text-muted">Výpočet</dt>
+                        <dd class="mt-1 text-lg font-bold text-ink">Ze základu, před daní</dd>
+                    </div>
+                    <div class="section-card rounded-2xl p-4 shadow-card">
+                        <dt class="text-sm text-muted">Jednorázová</dt>
+                        <dd class="mt-1 text-lg font-bold text-ink">Náhled ji nespotřebuje, uložení ano</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div class="relative flex items-center">
+                <div class="section-card w-full rounded-[28px] bg-paper p-6 shadow-soft sm:p-8 lg:rotate-[1.5deg]">
+                    <div class="flex items-baseline justify-between gap-4 border-b-2 border-ink pb-3">
+                        <div class="font-display text-2xl font-extrabold text-ink">Faktura</div>
+                        <div class="text-sm text-muted">Severka Studio s.r.o.</div>
+                    </div>
+
+                    <div class="divide-y divide-line">
+                        <div class="flex items-center justify-between gap-4 py-3">
+                            <div>
+                                <div class="font-medium text-ink">Implementace nového webu</div>
+                                <div class="text-xs text-muted">Pevná cena</div>
+                            </div>
+                            <div class="tabular-nums text-ink">15 000,00 Kč</div>
+                        </div>
+                        <div class="flex items-center justify-between gap-4 py-3">
+                            <div>
+                                <div class="font-medium text-ink">Workshop a konzultace obsahu</div>
+                                <div class="text-xs text-muted">4 h × 2 500,00 Kč</div>
+                            </div>
+                            <div class="tabular-nums text-ink">10 000,00 Kč</div>
+                        </div>
+                    </div>
+
+                    <div class="my-1 rounded-r-xl border-l-4 border-copper-500 bg-copper-50">
+                        <div class="flex items-center justify-between gap-4 px-4 py-3">
+                            <div>
+                                <div class="font-semibold text-copper-600">Věrnostní sleva</div>
+                                <div class="text-xs text-copper-700/80">10 % z 25 000,00 Kč</div>
+                            </div>
+                            <div class="tabular-nums font-semibold text-copper-600">−2 500,00 Kč</div>
+                        </div>
+                        <div class="flex items-center justify-between gap-4 border-t border-copper-100 px-4 py-3">
+                            <div>
+                                <div class="font-semibold text-copper-600">Kompenzace za zpožděné dodání</div>
+                                <div class="text-xs text-copper-700/80">Pevná částka</div>
+                            </div>
+                            <div class="tabular-nums font-semibold text-copper-600">−2 500,00 Kč</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 space-y-1 text-sm text-muted">
+                        <div class="flex justify-between"><span>Základ</span><span class="tabular-nums text-ink">20 000,00 Kč</span></div>
+                        <div class="flex justify-between"><span>DPH 21 %</span><span class="tabular-nums text-ink">4 200,00 Kč</span></div>
+                    </div>
+
+                    <div class="mt-3 flex items-baseline justify-between border-t-2 border-ink pt-3">
+                        <div class="font-display text-xl font-extrabold text-ink">Celkem</div>
+                        <div class="flex items-baseline gap-3">
+                            <span class="strike tabular-nums text-sm text-muted">30 250,00 Kč</span>
+                            <span class="tabular-nums font-display text-2xl font-extrabold text-ink">24 200,00 Kč</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div class="section-card rounded-[28px] p-6 shadow-card sm:p-8">
+                <div class="max-w-3xl">
+                    <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-500">Co plugin umí</p>
+                    <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">Sleva patří jedné faktuře – ne zákazníkovi ani šabloně.</h2>
+                    <p class="mt-3 text-lg text-muted">Nejdřív vidíte částku faktury, pak se rozhodnete. Časové záznamy, sazby ani rozpočty se nemění.</p>
+                </div>
+
+                <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    <article class="rounded-2xl border border-line bg-paper p-5">
+                        <div class="text-2xl">🧾</div>
+                        <h3 class="mt-3 text-xl font-bold text-ink">Více slevových řádků</h3>
+                        <p class="mt-2 text-muted">Až 10 řádků na fakturu, každý s vlastním popisem – pevná částka bez daně, nebo procento.</p>
+                    </article>
+                    <article class="rounded-2xl border border-line bg-paper p-5">
+                        <div class="text-2xl">⚡</div>
+                        <h3 class="mt-3 text-xl font-bold text-ink">Zadáte ji tam, kde fakturujete</h3>
+                        <p class="mt-2 text-muted">Na stránce „Vytvořit fakturu“ klikněte u zákazníka na „+ Sleva“. Sloupec Celková cena se hned přepočítá.</p>
+                    </article>
+                    <article class="rounded-2xl border border-line bg-paper p-5">
+                        <div class="text-2xl">✅</div>
+                        <h3 class="mt-3 text-xl font-bold text-ink">Správné součty všude</h3>
+                        <p class="mt-2 text-muted">Sleva je součástí řádků faktury, mezisoučtu, daní i celkové částky uložené v Kimai – a tedy i PDF, platebního QR kódu a exportu do XLSX.</p>
+                    </article>
+                    <article class="rounded-2xl border border-line bg-paper p-5">
+                        <div class="text-2xl">🔒</div>
+                        <h3 class="mt-3 text-xl font-bold text-ink">Použije se právě jednou</h3>
+                        <p class="mt-2 text-muted">Náhled si zobrazte, kolikrát chcete. Uložení faktury slevu spotřebuje – i při dvou otevřených kartách, dvojkliku nebo opakovaném odeslání.</p>
+                    </article>
+                    <article class="rounded-2xl border border-line bg-paper p-5">
+                        <div class="text-2xl">📌</div>
+                        <h3 class="mt-3 text-xl font-bold text-ink">Neměnný snapshot</h3>
+                        <p class="mt-2 text-muted">Každá uložená faktura si nese snapshot slev a výpočtu, takže se historické faktury nikdy nezmění.</p>
+                    </article>
+                    <article class="rounded-2xl border border-line bg-paper p-5">
+                        <div class="text-2xl">📊</div>
+                        <h3 class="mt-3 text-xl font-bold text-ink">Report se slevami</h3>
+                        <p class="mt-2 text-muted">„Fakturováno (se slevami)“ sčítá uložené faktury po zákaznících a měsících: základ před slevou, sleva, daň a celkem. <span class="font-semibold text-copper-600">S licencí</span></p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div class="section-card rounded-[28px] p-6 shadow-card sm:p-8">
+                <div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+                    <div>
+                        <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-500">Výpočet</p>
+                        <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">Jedno jasné pravidlo: postupně, vždy ze zbývajícího základu.</h2>
+                        <ul class="mt-5 space-y-3 text-base text-muted">
+                            <li class="flex gap-3"><span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-copper-500"></span><span>Každý řádek se uplatní v pořadí na to, co zbylo po předchozím; daně se počítají až potom.</span></li>
+                            <li class="flex gap-3"><span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-copper-500"></span><span>Počítá se v celých haléřích, procenta se zaokrouhlují matematicky. Součet slevových řádků vždy přesně sedí.</span></li>
+                            <li class="flex gap-3"><span class="mt-2 h-2 w-2 shrink-0 rounded-full bg-copper-500"></span><span>Bez slevy počítá plugin přesně stejně jako kalkulátor Kimai.</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-2xl border border-line bg-paper">
+                        <table class="w-full min-w-[30rem] text-left text-sm">
+                            <thead class="bg-cream text-xs uppercase tracking-wider text-muted">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 font-semibold">Základ</th>
+                                    <th scope="col" class="px-4 py-3 font-semibold">Slevové řádky</th>
+                                    <th scope="col" class="px-4 py-3 text-right font-semibold">Výsledek bez daně</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-line tabular-nums text-ink">
+                                <tr>
+                                    <td class="px-4 py-3">1 000,00 Kč</td>
+                                    <td class="px-4 py-3 text-copper-600">−10 %, pak −100,00 Kč</td>
+                                    <td class="px-4 py-3 text-right font-bold">800,00 Kč</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3">1 000,00 Kč</td>
+                                    <td class="px-4 py-3 text-copper-600">−100,00 Kč, pak −10 %</td>
+                                    <td class="px-4 py-3 text-right font-bold">810,00 Kč</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3">1 000,00 Kč</td>
+                                    <td class="px-4 py-3 text-copper-600">−10 %, pak −10 %</td>
+                                    <td class="px-4 py-3 text-right font-bold">810,00 Kč</td>
+                                </tr>
+                                <tr class="bg-copper-50/60">
+                                    <td class="px-4 py-3" colspan="2">800,00 Kč bez daně + DPH 21 % (168,00 Kč)</td>
+                                    <td class="px-4 py-3 text-right font-extrabold">968,00 Kč</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div class="grid gap-6 lg:grid-cols-2">
+                <article class="section-card overflow-hidden rounded-[28px] p-4 shadow-card sm:p-5">
+                    <div class="mb-4">
+                        <p class="text-sm font-bold uppercase tracking-[0.16em] text-copper-500">Vytvořit fakturu</p>
+                        <h3 class="font-display text-2xl font-extrabold text-ink">Editor slevy přímo u zákazníka</h3>
+                    </div>
+                    <img src="images/editor.png" alt="Stránka Vytvořit fakturu v Kimai s otevřeným editorem slevy u zákazníka" width="1600" height="815" class="w-full rounded-2xl border border-line" loading="lazy">
+                    <p class="mt-4 text-muted">Přidejte řádky, zvolte procento nebo pevnou částku a klikněte na „Použít“. Chybné zadání se ukáže v editoru a nic se neuloží.</p>
+                </article>
+
+                <article class="section-card overflow-hidden rounded-[28px] p-4 shadow-card sm:p-5">
+                    <div class="mb-4">
+                        <p class="text-sm font-bold uppercase tracking-[0.16em] text-copper-500">Celková cena</p>
+                        <h3 class="font-display text-2xl font-extrabold text-ink">Zlevněnou částku vidíte ještě před uložením</h3>
+                    </div>
+                    <img src="images/row-total.png" alt="Řádek zákazníka se zlevněnou celkovou cenou a původní částkou" width="1600" height="570" class="w-full rounded-2xl border border-line" loading="lazy">
+                    <p class="mt-4 text-muted">Server ji spočítá stejně jako náhled: tučně zlevněná částka s daní, pod ní původní částka.</p>
+                </article>
+
+                <article class="section-card overflow-hidden rounded-[28px] p-4 shadow-card sm:p-5">
+                    <div class="mb-4">
+                        <p class="text-sm font-bold uppercase tracking-[0.16em] text-copper-500">Dokument faktury</p>
+                        <h3 class="font-display text-2xl font-extrabold text-ink">Vaše šablony fungují bez úprav</h3>
+                    </div>
+                    <div class="max-h-[30rem] overflow-hidden rounded-2xl border border-line">
+                        <img src="images/invoice.png" alt="PDF faktury se dvěma slevovými řádky a přepočteným mezisoučtem, daní a celkovou částkou" width="1230" height="1600" class="w-full" loading="lazy">
+                    </div>
+                    <p class="mt-4 text-muted">Slevy jsou běžné řádky faktury se zápornou částkou. Vestavěné dokumenty Kimai nepotřebují žádnou úpravu; vlastní šablony mají k dispozici další proměnné, např. <code class="rounded bg-copper-50 px-1.5 py-0.5 text-sm text-copper-700">invoice.discount_total</code>.</p>
+                </article>
+
+                <article class="section-card overflow-hidden rounded-[28px] p-4 shadow-card sm:p-5">
+                    <div class="mb-4">
+                        <p class="text-sm font-bold uppercase tracking-[0.16em] text-copper-500">Přehledy</p>
+                        <h3 class="font-display text-2xl font-extrabold text-ink">Fakturované částky se slevami</h3>
+                    </div>
+                    <img src="images/report.png" alt="Report Fakturováno (se slevami) seskupený podle zákazníků se součty za měnu" width="1600" height="1061" class="w-full rounded-2xl border border-line" loading="lazy">
+                    <p class="mt-4 text-muted">Filtr podle období, zákazníka a stavu, seskupení podle zákazníka a/nebo měsíce, součty za každou měnu a export do XLSX.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="pricing" class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div class="section-card rounded-[28px] p-6 shadow-card sm:p-8">
+                <div class="max-w-3xl">
+                    <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-500">Cena</p>
+                    <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">Začněte zdarma. Licenci kupte, až budete potřebovat víc.</h2>
+                </div>
+
+                <div class="mt-8 grid gap-4 md:grid-cols-2">
+                    <div class="rounded-2xl border border-line bg-paper p-6">
+                        <div class="text-sm font-bold uppercase tracking-[0.14em] text-muted">Zdarma</div>
+                        <div class="mt-2 font-display text-4xl font-black text-ink">0 €</div>
+                        <ul class="mt-5 space-y-3 text-muted">
+                            <li class="flex gap-3"><span class="text-copper-500">✓</span><span><strong class="text-ink">3 slevy měsíčně</strong> na instalaci Kimai</span></li>
+                            <li class="flex gap-3"><span class="text-copper-500">✓</span><span>Všechny funkce faktur: editor, PDF, QR kód, snapshoty, historie</span></li>
+                            <li class="flex gap-3"><span class="text-muted/50">–</span><span>Report „Fakturováno (se slevami)“</span></li>
+                        </ul>
+                        <a href="https://github.com/Cuchulain/kimai-discount-bundle-dist/releases/latest/download/DiscountBundle.zip"
+                           data-umami-event="download-release"
+                           data-umami-event-placement="pricing"
+                           class="mt-6 inline-flex w-full items-center justify-center rounded-full border border-ink/20 px-6 py-3 font-semibold text-ink transition hover:border-copper-500/60">
+                            Stáhnout zdarma
+                        </a>
+                    </div>
+
+                    <div class="rounded-2xl border-2 border-copper-500 bg-paper p-6 shadow-soft">
+                        <div class="text-sm font-bold uppercase tracking-[0.14em] text-copper-500">Licence</div>
+                        <div class="mt-2 font-display text-4xl font-black text-ink">49 € <span class="text-lg font-semibold text-muted">/ rok</span></div>
+                        <ul class="mt-5 space-y-3 text-muted">
+                            <li class="flex gap-3"><span class="text-copper-500">✓</span><span><strong class="text-ink">Neomezený počet slev</strong></span></li>
+                            <li class="flex gap-3"><span class="text-copper-500">✓</span><span>Report „Fakturováno (se slevami)“ a jeho export do XLSX</span></li>
+                            <li class="flex gap-3"><span class="text-copper-500">✓</span><span>Jedna produkční a jedna testovací instalace</span></li>
+                        </ul>
+                        <a href="https://witcher.lemonsqueezy.com/checkout/buy/a7fea23c-0c89-49e4-8d8a-71d21d94d8ed"
+                           data-umami-event="buy-click"
+                           data-umami-event-placement="pricing"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="mt-6 inline-flex w-full items-center justify-center rounded-full bg-copper-500 px-6 py-3 font-bold text-white transition hover:bg-copper-600">
+                            Koupit na Lemon Squeezy
+                        </a>
+                    </div>
+                </div>
+
+                <p class="mt-5 text-sm text-muted">
+                    Klíč aktivujete v Kimai v <strong class="text-ink">Systém → Licence DiscountBundle</strong>. Licence se ověřuje nejvýše jednou za 7 dní
+                    (odesílá se jen klíč, identifikátor aktivace a doména Kimai) a při nedostupnosti serveru platí dál 30 dní.
+                    Po skončení licence přejde plugin do verze zdarma – vytvořené faktury a jejich slevy zůstanou beze změny.
+                </p>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div class="section-card rounded-[28px] p-6 shadow-card sm:p-8">
+                <div class="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+                    <div>
+                        <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-500">Rychlý start</p>
+                        <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">Nainstalujte, zvolte kalkulátor a zlevněte další fakturu.</h2>
+                        <ol class="mt-5 space-y-3 text-base text-muted">
+                            <li class="flex gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-copper-500 text-xs font-bold text-white">1</span><span>Rozbalte plugin do <code class="text-ink">var/plugins/</code> tak, aby vznikl adresář <code class="text-ink">var/plugins/DiscountBundle/</code>, a spusťte příkazy vpravo.</span></li>
+                            <li class="flex gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-copper-500 text-xs font-bold text-white">2</span><span>V <strong class="text-ink">Faktury → Šablona faktury</strong> nastavte seskupení řádků faktury na „Výchozí … + sleva“ nebo „Projekt + sleva“.</span></li>
+                            <li class="flex gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-copper-500 text-xs font-bold text-white">3</span><span>Ve <strong class="text-ink">Faktury → Vytvořit fakturu</strong> klikněte na „+ Sleva“, zadejte řádky a fakturu uložte.</span></li>
+                        </ol>
+                    </div>
+
+                    <div class="rounded-[24px] border border-line bg-paper p-5 shadow-card">
+                        <div class="mb-3 text-sm font-semibold uppercase tracking-[0.14em] text-muted">Instalační příkazy</div>
+                        <pre class="overflow-x-auto rounded-2xl bg-ink p-4 text-sm leading-6 text-cream">unzip DiscountBundle.zip -d var/plugins/
+bin/console kimai:reload
+bin/console kimai:bundle:discount:install</pre>
+                        <p class="mt-3 text-sm text-muted">Spouštějte pod uživatelem webového serveru (např. <code class="text-ink">www-data</code>). Funguje i v Dockeru s <code class="text-ink">kimai/kimai2</code>.</p>
+                        <div class="mt-4 grid gap-3 text-sm text-ink">
+                            <div class="rounded-2xl border border-line px-4 py-3">Kimai 2.71 nebo novější (ověřeno s 2.71.0)</div>
+                            <div class="rounded-2xl border border-line px-4 py-3">MySQL / MariaDB, stejně jako Kimai</div>
+                            <div class="rounded-2xl border border-line px-4 py-3">Měny se dvěma desetinnými místy (CZK, EUR, USD …)</div>
+                            <div class="rounded-2xl border border-line px-4 py-3">Rozhraní v češtině a angličtině</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div class="section-card rounded-[28px] p-6 shadow-card sm:p-8">
+                <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-500">FAQ</p>
+                <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">Dobré vědět</h2>
+
+                <div class="mt-6 divide-y divide-line border-y border-line">
+                    <details class="group py-4">
+                        <summary class="flex cursor-pointer items-center justify-between gap-4 text-lg font-semibold text-ink">Musím upravit šablonu faktury?<span class="faq-icon text-2xl font-light text-copper-500 transition">+</span></summary>
+                        <p class="mt-3 text-muted">Ne. Slevové řádky jsou součástí <code>entries</code> a <code>invoice.subtotal</code>, <code>invoice.tax_rows</code>, <code>invoice.total</code> i <code>invoice.total_plain</code> je už obsahují. Úpravu potřebují jen vlastní dokumenty, které si součty počítají samy – a slevu v Twigu nikdy neodečítejte znovu.</p>
+                    </details>
+                    <details class="group py-4">
+                        <summary class="flex cursor-pointer items-center justify-between gap-4 text-lg font-semibold text-ink">Mění plugin časové záznamy, sazby nebo rozpočty?<span class="faq-icon text-2xl font-light text-copper-500 transition">+</span></summary>
+                        <p class="mt-3 text-muted">Ne. Odpracovaný čas, sazby, interní sazby i rozpočty zůstávají beze změny. Proto slevu nezahrnují přehledy Kimai postavené na časových záznamech – historie faktur, její export a report pluginu ano.</p>
+                    </details>
+                    <details class="group py-4">
+                        <summary class="flex cursor-pointer items-center justify-between gap-4 text-lg font-semibold text-ink">Co když slevu použiji se šablonou s jiným kalkulátorem?<span class="faq-icon text-2xl font-light text-copper-500 transition">+</span></summary>
+                        <p class="mt-3 text-muted">Kimai náhled i uložení odmítne se srozumitelným hlášením. Sleva se nikdy tiše neignoruje.</p>
+                    </details>
+                    <details class="group py-4">
+                        <summary class="flex cursor-pointer items-center justify-between gap-4 text-lg font-semibold text-ink">Můžu plugin později odinstalovat?<span class="faq-icon text-2xl font-light text-copper-500 transition">+</span></summary>
+                        <p class="mt-3 text-muted">Ano. Přepněte šablony faktur zpět na kalkulátory Kimai a plugin vypněte. Uložené faktury, jejich částky, PDF i snapshoty zůstanou beze změny; plugin nikdy nemaže data automaticky.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8 lg:pb-24">
+            <div class="rounded-[32px] bg-ink p-6 text-cream shadow-soft sm:p-8 lg:p-10">
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                    <div class="max-w-2xl">
+                        <p class="eyebrow text-sm font-bold uppercase tracking-[0.18em] text-copper-100">Připraveno k použití</p>
+                        <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Slevu dejte na faktuře, ne bokem.</h2>
+                        <p class="mt-3 text-lg text-cream/75">Stáhněte verzi zdarma a vyzkoušejte ji na příští faktuře. Na neomezené slevy a report můžete přejít kdykoli.</p>
+                    </div>
+                    <div class="flex flex-col gap-3 sm:flex-row">
+                        <a href="https://github.com/Cuchulain/kimai-discount-bundle-dist/releases"
+                           data-umami-event="public-release"
+                           data-umami-event-placement="bottom"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-flex items-center justify-center rounded-full border border-cream/30 px-6 py-3 text-base font-semibold text-white transition hover:border-cream/60">
+                            Všechna vydání
+                        </a>
+                        <a href="https://witcher.lemonsqueezy.com/checkout/buy/a7fea23c-0c89-49e4-8d8a-71d21d94d8ed"
+                           data-umami-event="buy-click"
+                           data-umami-event-placement="bottom"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-flex items-center justify-center rounded-full bg-copper-500 px-6 py-3 text-base font-bold text-white transition hover:bg-copper-600">
+                            Koupit na Lemon Squeezy
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="mx-auto max-w-7xl px-4 pb-8 text-center sm:px-6 lg:px-8">
+        <div class="border-t border-line pt-5 text-sm text-muted">
+            Vytvořil <a href="https://github.com/Cuchulain" target="_blank" rel="noopener noreferrer" class="font-semibold text-ink transition hover:text-copper-600">Jan Čejka</a> · © 2026
+            · Od stejného autora: <a href="https://kimai-jira-sync.jancejka.cz/cs/" target="_blank" rel="noopener" class="font-semibold text-ink transition hover:text-copper-600">Kimai Jira Sync</a>
+        </div>
+    </footer>
+</div>
+</body>
+</html>
